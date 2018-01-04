@@ -1430,7 +1430,7 @@ static const CGFloat SVProgressHUDLabelSpacing = 8.0f;
 }
 
 #if TARGET_OS_IOS && __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
-- (UINotificationFeedbackGenerator *)hapticGenerator {
+- (UINotificationFeedbackGenerator *)hapticGenerator NS_AVAILABLE_IOS(11.0) {
 	// Only return if haptics are enabled
 	if(!self.hapticsEnabled) {
 		return nil;
