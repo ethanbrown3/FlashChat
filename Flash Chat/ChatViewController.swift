@@ -9,12 +9,11 @@
 import UIKit
 import Firebase
 
-class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
     // Declare instance variables here
 
     
-    // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     @IBOutlet var sendButton: UIButton!
     @IBOutlet var messageTextfield: UITextField!
@@ -25,20 +24,13 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //TODO: Set yourself as the delegate and datasource here:
         messageTableView.delegate = self
         messageTableView.dataSource = self
+        messageTextfield.delegate = self
         
-        
-        //TODO: Set yourself as the delegate of the text field here:
-        
-        
-        
-        //TODO: Set the tapGesture here:
-        
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tableViewTapped))
+        messageTableView.addGestureRecognizer(tapGesture)
 
-        //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
         
         configureTableView()
@@ -72,8 +64,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     
-    //TODO: Declare tableViewTapped here:
-    
+    @objc func tableViewTapped() {
+        messageTextfield.endEditing(true)
+    }
     
     
     //TODO: Declare configureTableView here:
@@ -86,17 +79,40 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     ///////////////////////////////////////////
     
     //MARK:- TextField Delegate Methods
-    
-    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            var newHeightConstraint : CGFloat = 20.0
+            print(keyboardHeight)
+
+            if keyboardHeight < 260 { // iphone 8
+                newHeightConstraint = 308
+            } else if keyboardHeight < 280 { // iphone 8 plus
+                newHeightConstraint = 321
+            } else { // iphone x
+                newHeightConstraint = keyboardHeight + 20.0
+            }
+            UIView.animate(withDuration: 0.5) {
+                self.heightConstraint.constant = newHeightConstraint
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
 
     
-    //TODO: Declare textFieldDidBeginEditing here:
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
+    }
     
     
-    
-    
-    //TODO: Declare textFieldDidEndEditing here:
-    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            self.heightConstraint.constant = 50
+            self.view.layoutIfNeeded()
+        }
+    }
 
     
     ///////////////////////////////////////////
